@@ -6,7 +6,7 @@ const { Thought, User } = require('../models')
 module.exports = {
     async getAllThoughts(req, res) {
         try {
-
+            
         } catch (err) {
 
         }
@@ -38,7 +38,6 @@ module.exports = {
     },
 
     async deleteThought(req, res) {
-        // Bonus is to remove Thoughts associated thoughts when deleted
         try {
 
         } catch (err) {
