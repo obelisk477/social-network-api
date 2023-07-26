@@ -10,7 +10,7 @@ const {
 } = require('../../controllers/thoughtController')
 
 
-
-
+router.route('/').get(getAllThoughts).post(addThought)
+router.route('/:thoughtId').get(getSingleThought).delete(deleteThought)
 
 module.exports = router
