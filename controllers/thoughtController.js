@@ -27,7 +27,8 @@ module.exports = {
             res.status(200).json(thought)
 
         } catch (err) {
-            
+            console.log(err)
+            res.status(500).json(err)
         }
     },
 
@@ -47,15 +48,41 @@ module.exports = {
 
             res.json('Thought created and associated with user')
         } catch (err) {
-            
+            console.log(err)
+            res.status(500).json(err)
+
         }
     },
 
     async updateThought(req, res) {
         try {
+            
+            let compareThought = await Thought.findOne({_id: req.params.thoughtId})
+
+            if (req.body.username && compareThought.username != req.body.username) {
+                return res.status(500).json({message: 'Cannot update the username property of a thought'})
+            }
+
+            const thought = await Thought.findOneAndUpdate(
+                {_id: req.params.thoughtId},
+                {$set: req.body},
+                {
+                    new:true
+                },
+            )
+
+            if (!thought) {
+                console.log(thought)
+                res.status(404).json({ message: 'No thought with this id!' });
+              }
+        
+              res.json(thought);
+
 
         } catch (err) {
-            
+            console.log(err)
+            res.status(500).json(err)
+
         }
     },
 
@@ -75,14 +102,16 @@ module.exports = {
             }
 
             if (!user) {
-                return res.status(404).json({message: 'thought'})
+                return res.status(404).json({message: 'Thought deleted, but was not associated with a user'})
             }
 
 
             res.status(200).json({message: 'Thought deleted & removed from user'})
 
         } catch (err) {
-            
+            console.log(err)
+            res.status(500).json(err)
+
         }
     },
 
