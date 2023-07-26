@@ -6,7 +6,7 @@ const { Thought, User } = require('../models')
 module.exports = {
     async getAllUsers(req, res) {
         try {
-            const users = await User.find()
+            const users = await User.find().select('-__v')
 
             res.json(users)
         } catch (err) {
@@ -53,7 +53,7 @@ module.exports = {
                     runValidators: true,
                     new:true
                 },
-            )
+            ).select('-__v')
             console.log(user)
 
             if (!user) {
@@ -71,13 +71,13 @@ module.exports = {
 
     async deleteUser(req, res) {
         try {
-            const user = await User.findOneAndDelete({_id: req.params.userId})
+            const user = await User.findOneAndDelete({_id: req.params.userId}).select('-__v')
 
             if(!user) {
                 return res.status(404).json({message: 'No such user exists'})
             }
 
-            const thoughtsToRemove = await Thought.deleteMany({username: user.username})
+            const thoughtsToRemove = await Thought.deleteMany({username: user.username}).select('-__v')
 
             if(thoughtsToRemove.deletedCount == 0) {
                 return res.status(404).json({message: 'User deleted, but no thoughts found'})
@@ -97,18 +97,13 @@ module.exports = {
                 {_id: req.params.userId},
                 {$addToSet: {friends: req.params.friendId}},
                 {new: true},
-            )
+            ).select('-__v')
             
             if (!user) {
                 return res.status(404).json({message: 'No user found with this ID'})
             }
-
-            const responseObj = {
-                ...user._doc,
-                friendCount: user.friendCount
-            }
         
-            res.status(200).json({responseObj})
+            res.status(200).json({user})
 
         } catch (err) {
             console.log(err)
@@ -121,13 +116,13 @@ module.exports = {
 
             let oldUserData = await User.findOne({
                 _id: req.params.userId
-            })
+            }).select('-__v')
             
             const user = await User.findOneAndUpdate(
                 {_id: req.params.userId},
                 {$pull: {friends: req.params.friendId}},
                 {new: true},
-            )
+            ).select('-__v')
 
             if (!user) {
                 return res.status(404).json({message: 'No user found with this ID'})

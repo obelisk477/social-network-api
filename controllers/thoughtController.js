@@ -6,7 +6,7 @@ const { Thought, User } = require('../models')
 module.exports = {
     async getAllThoughts(req, res) {
         try {
-            const thoughts = await Thought.find()
+            const thoughts = await Thought.find().select('-__v')
 
             res.json(thoughts)
         } catch (err) {
@@ -18,10 +18,10 @@ module.exports = {
 
     async getSingleThought(req, res) {
         try {
-            let thought = await Thought.findOne({_id: req.params.thoughtId})
+            let thought = await Thought.findOne({_id: req.params.thoughtId}).select('-__v')
 
             if (!thought) {
-                res.status(400).json({message: 'No thought with that ID'})
+                return res.status(400).json({message: 'No thought with that ID'})
             }
 
             res.status(200).json(thought)
@@ -56,7 +56,7 @@ module.exports = {
     async updateThought(req, res) {
         try {
             
-            let compareThought = await Thought.findOne({_id: req.params.thoughtId})
+            let compareThought = await Thought.findOne({_id: req.params.thoughtId}).select('-__v')
 
             if (req.body.username && compareThought.username != req.body.username) {
                 return res.status(500).json({message: 'Cannot update the username property of a thought'})
@@ -68,7 +68,7 @@ module.exports = {
                 {
                     new:true
                 },
-            )
+            ).select('-__v')
 
             if (!thought) {
                 console.log(thought)
@@ -88,13 +88,13 @@ module.exports = {
     async deleteThought(req, res) {
         try {
 
-            const thought = await Thought.findOneAndDelete({_id: req.params.thoughtId})
+            const thought = await Thought.findOneAndDelete({_id: req.params.thoughtId}).select('-__v')
 
             const user = await User.findOneAndUpdate(
                 {username: thought.username},
                 {$pull: {thoughts: req.params.thoughtId}},
                 {new: true},
-            )
+            ).select('-__v')
 
             if (!thought) {
                 return res.status(404).json({message: 'No thought found with this ID'})
