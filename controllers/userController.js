@@ -43,6 +43,26 @@ module.exports = {
 
     async updateUser(req, res) {
         try {
+            
+            console.log('Updating user...')
+
+            const user = await User.findOneAndUpdate(
+                {_id: req.params.userId},
+                {$set: req.body},
+                {
+                    runValidators: true,
+                    new:true
+                },
+            )
+            console.log(user)
+
+            if (!user) {
+                console.log(user)
+                res.status(404).json({ message: 'No user with this id!' });
+              }
+        
+              res.json(user);
+
 
         } catch (err) {
             
