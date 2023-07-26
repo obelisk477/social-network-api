@@ -13,9 +13,14 @@ const {
 router.route('/')
     .get(getAllThoughts)
     .post(addThought)
+
 router.route('/:thoughtId')
     .get(getSingleThought)
     .delete(deleteThought)
     .put(updateThought)
+
+// router.route('/:thoughtId/reactions')
+//     .post(addReactionToThought)
+//     .delete(delReactionFromThought)
 
 module.exports = router
