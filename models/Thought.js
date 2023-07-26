@@ -19,7 +19,10 @@ const reactionSchema = new Schema({
         default: Date.now,
         get: formatDate
     }
-});
+    },
+    {
+        _id: false,
+    });
 
 reactionSchema.virtual('formattedDate').get(function () {
     return this.createdAt.toDateString()
@@ -44,13 +47,18 @@ const thoughtSchema = new Schema(
             required: true
         },
         reactions: [reactionSchema]
+    },
+    {
+        toJSON: {
+          virtuals: true,
+        },
+        id: false,
     }
 )
 
 function formatDate(date) {
     return date.toDateString()
 }
-
 
 thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length

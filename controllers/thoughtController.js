@@ -117,8 +117,27 @@ module.exports = {
     async addReactionToThought(req, res) {
         try {
 
-        } catch (err) {
+            const reactingUser = await User.findOne({username: req.body.username})
+
+            if (!reactingUser) {
+                return res.status(404).json({message: 'No user found with this username'})
+            }
+        
+            const thought = await Thought.findOneAndUpdate(
+                {_id: req.params.thoughtId},
+                {$addToSet: {reactions: req.body}},
+                {new: true},
+            ).select('-__v')
             
+            if (!thought) {
+                return res.status(404).json({message: 'No thought found with this ID'})
+            }
+        
+            res.status(200).json({thought})
+
+        } catch (err) {
+            console.log(err)
+            res.status(500).json(err)
         }
     },
 
