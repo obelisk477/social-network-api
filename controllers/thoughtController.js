@@ -144,8 +144,36 @@ module.exports = {
     async delReactionFromThought(req, res) {
         try {
 
-        } catch (err) {
+            let oldThoughtData = await Thought.findOne({
+                _id: req.params.thoughtId
+            }).select('-__v')
             
+            const reactionToDel = oldThoughtData.reactions
+                .filter((item) => item.reactionId == req.body.reactionId)
+
+            console.log(reactionToDel)
+
+            const thought = await Thought.findOneAndUpdate(
+                {_id: req.params.thoughtId},
+                {$pull: {reactions: reactionToDel[0]}},
+                {new: true},
+            ).select('-__v')
+
+            console.log(thought.reactionCount)
+
+            if (!thought) {
+                return res.status(404).json({message: 'No thought found with this ID'})
+            }
+
+            if (oldThoughtData.reactionCount == thought.reactionCount) {
+                return res.status(404).json('No reaction found with this reaction ID')
+            }
+
+            res.status(200).json(thought)
+
+        } catch (err) {
+            console.log(err)
+            res.status(500).json(err)
         }
     }
 }
