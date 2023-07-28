@@ -28,6 +28,7 @@ const userSchema = new Schema(
         toJSON: {
           virtuals: true,
         },
+        validateBeforeSave: true,
         id: false,
       }
 

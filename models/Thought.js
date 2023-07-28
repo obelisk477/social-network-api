@@ -21,13 +21,11 @@ const reactionSchema = new Schema({
     }
     },
     {
+        toJSON: {
+            getters: true
+          },
         _id: false,
     });
-
-reactionSchema.virtual('formattedDate').get(function () {
-    return this.createdAt.toDateString()
-})
-
 
 const thoughtSchema = new Schema(
     {
@@ -51,6 +49,7 @@ const thoughtSchema = new Schema(
     {
         toJSON: {
           virtuals: true,
+          getters: true
         },
         id: false,
     }

@@ -33,7 +33,6 @@ module.exports = {
     },
 
     async addThought(req, res) {
-        // Don't forget to push created thoughts to the associated user's thoughts array field
         try {
             const thought = await Thought.create(req.body)
             const user = await User.findOneAndUpdate(
@@ -122,7 +121,9 @@ module.exports = {
             if (!reactingUser) {
                 return res.status(404).json({message: 'No user found with this username'})
             }
-        
+            
+            
+
             const thought = await Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 {$addToSet: {reactions: req.body}},
