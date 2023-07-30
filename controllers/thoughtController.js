@@ -1,9 +1,10 @@
 const { ObjectId } = require('mongoose').Types
 const { Thought, User } = require('../models')
 
-// Aggregate functions go here
+
 
 module.exports = {
+    // Get all thoughts
     async getAllThoughts(req, res) {
         try {
             const thoughts = await Thought.find().select('-__v')
@@ -16,6 +17,7 @@ module.exports = {
         }
     },
 
+    // Get single thought
     async getSingleThought(req, res) {
         try {
             let thought = await Thought.findOne({_id: req.params.thoughtId}).select('-__v')
@@ -32,6 +34,7 @@ module.exports = {
         }
     },
 
+    // Add thought for a given username in req.body
     async addThought(req, res) {
         try {
             const thought = await Thought.create(req.body)
@@ -52,11 +55,13 @@ module.exports = {
         }
     },
 
+    // Update thought with data in req.body based on thoughtId in params
     async updateThought(req, res) {
         try {
             
             let compareThought = await Thought.findOne({_id: req.params.thoughtId}).select('-__v')
 
+            // Checks if you are trying to update the username, and stops you if you are, as this functions as a primary key
             if (req.body.username && compareThought.username != req.body.username) {
                 return res.status(500).json({message: 'Cannot update the username property of a thought'})
             }
@@ -84,6 +89,7 @@ module.exports = {
         }
     },
 
+    // Delete thought by param :thoughtId in route
     async deleteThought(req, res) {
         try {
 
@@ -99,6 +105,7 @@ module.exports = {
                 return res.status(404).json({message: 'No thought found with this ID'})
             }
 
+            // If no user found, deletes thought but returns a message that no user was found
             if (!user) {
                 return res.status(404).json({message: 'Thought deleted, but was not associated with a user'})
             }
@@ -113,17 +120,17 @@ module.exports = {
         }
     },
 
+    // Adds a reaction to an existing thought
     async addReactionToThought(req, res) {
         try {
 
+            // Checks if username being submitted exists in user collection
             const reactingUser = await User.findOne({username: req.body.username})
 
             if (!reactingUser) {
                 return res.status(404).json({message: 'No user found with this username'})
             }
             
-            
-
             const thought = await Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 {$addToSet: {reactions: req.body}},
@@ -142,6 +149,7 @@ module.exports = {
         }
     },
 
+    // Deletes a reaction from a thought based on :thoughtId in params
     async delReactionFromThought(req, res) {
         try {
 
@@ -149,11 +157,13 @@ module.exports = {
                 _id: req.params.thoughtId
             }).select('-__v')
             
+            // Gets entire reaction object to delete
             const reactionToDel = oldThoughtData.reactions
                 .filter((item) => item.reactionId == req.body.reactionId)
 
             console.log(reactionToDel)
 
+            // Pulls entire reaction object from reaction field
             const thought = await Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 {$pull: {reactions: reactionToDel[0]}},

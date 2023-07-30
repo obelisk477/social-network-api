@@ -1,5 +1,7 @@
 const { Schema, Types, model } = require('mongoose')
 
+// Reaction schema for the reactions field in Thought model
+// Reaction will not be a model itself
 const reactionSchema = new Schema({
     reactionId: {
         type: Schema.Types.ObjectId,
@@ -55,10 +57,12 @@ const thoughtSchema = new Schema(
     }
 )
 
+// Helper function for thought & reaction getters
 function formatDate(date) {
     return date.toDateString()
 }
 
+// Virtual to get reaction array length on query of thoughts
 thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length
 })

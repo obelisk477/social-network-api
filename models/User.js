@@ -8,6 +8,7 @@ const userSchema = new Schema(
             required: true,
             trim: true            
         },
+        // Match regex is for email validation
         email: {
             type: String,
             unique: true,
@@ -28,12 +29,15 @@ const userSchema = new Schema(
         toJSON: {
           virtuals: true,
         },
+        // Validate before keeps server from stalling out on re-validate during update queries
         validateBeforeSave: true,
         id: false,
       }
 
 )
 
+
+// Virtual returns length of friend array; functions as friend counter
 userSchema.virtual('friendCount').get(function() {
     return this.friends.length
 })

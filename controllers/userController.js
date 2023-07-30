@@ -1,9 +1,10 @@
 const { ObjectId } = require('mongoose').Types
 const { Thought, User } = require('../models')
 
-// Aggregate functions go here
 
 module.exports = {
+
+    // Get all users from collection
     async getAllUsers(req, res) {
         try {
             const users = await User.find()
@@ -18,6 +19,7 @@ module.exports = {
         }
     },
 
+    // Get single user by :userId in params
     async getSingleUser(req, res) {
         try {
             const user = await User.findOne({_id: req.params.userId})
@@ -35,6 +37,7 @@ module.exports = {
         }
     },
 
+    // Add user to collection from info in req.body
     async addUser(req, res) {
         try {
             const user = await User.create(req.body);
@@ -45,11 +48,13 @@ module.exports = {
         }
     },
 
+    // Update user in collection by :userId param & with info in req.body
     async updateUser(req, res) {
         try {
             
             console.log('Updating user...')
 
+            // Make sure to re-run validators on email field during update
             const user = await User.findOneAndUpdate(
                 {_id: req.params.userId},
                 {$set: req.body},
@@ -73,6 +78,7 @@ module.exports = {
         }
     },
 
+    // Delete user by :userId param
     async deleteUser(req, res) {
         try {
             const user = await User.findOneAndDelete({_id: req.params.userId}).select('-__v')
@@ -81,8 +87,10 @@ module.exports = {
                 return res.status(404).json({message: 'No such user exists'})
             }
 
+            // If user deletion successful, delete thoughts assoicated iwth user
             const thoughtsToRemove = await Thought.deleteMany({username: user.username}).select('-__v')
 
+            // Message that no thoughts were found if no thoughts found on user
             if(thoughtsToRemove.deletedCount == 0) {
                 return res.status(404).json({message: 'User deleted, but no thoughts found'})
             }
@@ -95,6 +103,7 @@ module.exports = {
         }
     },
 
+    // Add friend to user's friends field by :friendId in params
     async addFriendToUser(req, res) {
         try {
             const user = await User.findOneAndUpdate(
@@ -115,6 +124,7 @@ module.exports = {
         }
     },
 
+    // Delete friend from user by :friendId in params
     async delFriendFromUser(req, res) {
         try {
 
@@ -132,6 +142,7 @@ module.exports = {
                 return res.status(404).json({message: 'No user found with this ID'})
             }
 
+            // Inform in response that friend not found / deleted if friend count unchanged
             if (oldUserData.friendCount == user.friendCount) {
                 return res.status(404).json('No friend found with this friend ID')
             }
